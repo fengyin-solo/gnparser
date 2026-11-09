@@ -2,6 +2,7 @@ package gnparser
 
 import (
 	"context"
+	"io"
 
 	"github.com/gnames/gnfmt"
 	"github.com/gnames/gnlib/ent/gnvers"
@@ -43,4 +44,13 @@ type GNparser interface {
 	// ParseNames takes a slice of name-strings, and returns a slice of
 	// parsed results in the same order as the input.
 	ParseNames([]string) []parsed.Parsed
+
+	// WriteResults streams parsed results to w using the currently
+	// configured output format (CSV, TSV, compact JSON or pretty JSON),
+	// flatten and details settings. For CSV and TSV the header is written
+	// exactly once, then every result is written separately in input
+	// order, without assembling one large string. It returns an error
+	// when w is nil, the configured format is invalid, the underlying
+	// writer fails, or a short write happens.
+	WriteResults(w io.Writer, results []parsed.Parsed) error
 }

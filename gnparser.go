@@ -7,6 +7,7 @@ package gnparser
 
 import (
 	"context"
+	"io"
 	"sync"
 
 	"github.com/gnames/gnfmt"
@@ -119,6 +120,23 @@ func (gnp gnparser) ParseNames(names []string) []parsed.Parsed {
 	close(chOut)
 	wgOut.Wait()
 	return res
+}
+
+// WriteResults streams parsed results to w using the format, flatten
+// and details settings of the current configuration. It delegates to
+// parsed.WriteResults, which writes records one at a time and returns
+// on the first writer or short-write error.
+func (gnp gnparser) WriteResults(
+	w io.Writer,
+	results []parsed.Parsed,
+) error {
+	return parsed.WriteResults(
+		w,
+		gnp.cfg.Format,
+		gnp.cfg.WithFlatOutput,
+		gnp.cfg.WithDetails,
+		results,
+	)
 }
 
 // WithFlatOutput returns whether flatten output is enabled.
